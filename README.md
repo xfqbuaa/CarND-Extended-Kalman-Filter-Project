@@ -12,6 +12,7 @@ Use the new data "obj_pose-laser-radar-synthetic-input.txt" and rmse results are
 * 0.450855
 * 0.439588
 ![rmse](./rmse.png)
+EKF RMSE less than required [.11, .11, 0.52, 0.52] and a little higher than later project UKF RMSE. 
 
 ### Improve code efficiency
 
