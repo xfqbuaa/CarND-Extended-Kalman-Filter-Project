@@ -2,6 +2,20 @@
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+## Updates 20170502
+
+### Results
+
+Use the new data "obj_pose-laser-radar-synthetic-input.txt" and rmse results are shown below:
+0.0972256
+0.0853761
+0.450855
+0.439588
+
+### Improve code efficiency
+
+Improve code efficiency according to suggestions in review feedback. 
+Using linux command time to show the application run time, but it seems not enough to evaluate code efficiency here. 
 
 ## Dependencies
 
