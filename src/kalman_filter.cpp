@@ -1,8 +1,10 @@
 #include "kalman_filter.h"
 #include <math.h>
+#include <iostream>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+using namespace std;
 
 #define pi 3.1415926
 
@@ -33,13 +35,14 @@ void KalmanFilter::Update(const VectorXd &z) {
   /**
     * update the state by using Kalman Filter equations
   */
+  // improve these following codes according to review suggestions. 
   VectorXd z_pred = H_ * x_;
   VectorXd y = z - z_pred;
   MatrixXd Ht = H_.transpose();
-  MatrixXd S = H_ * P_ * Ht + R_;
-  MatrixXd Si = S.inverse();
   MatrixXd PHt = P_ * Ht;
-  MatrixXd K = PHt * Si;
+  MatrixXd S = H_ * PHt + R_;
+  //MatrixXd Si = S.inverse();
+  MatrixXd K = PHt * S.inverse();
 
   //new estimate
   x_ = x_ + (K * y);
@@ -52,35 +55,41 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   /**
     * update the state by using Extended Kalman Filter equations
   */
-	float px = x_(0);
-	float py = x_(1);
-	float vx = x_(2);
-	float vy = x_(3);
+  // no influence on float or double for these following parameters
+  double px = x_[0];
+  double py = x_[1];
+  double vx = x_[2];
+  double vy = x_[3];
 
-	//pre-compute a set of terms to avoid repeated calculation
-	float c1 = px*px+py*py;
-	float c2 = sqrt(c1);
-	float phi = 0.0;
-	if (fabs(c2) > 0.0001) {
-    phi = atan2(x_[1], x_[0]);
+  //pre-compute a set of terms to avoid repeated calculation
+  //ignore unecessary c1
+  //double c1 = px*px+py*py;
+  double c2 = sqrt(px*px+py*py);
+  double phi = atan2(x_[1], x_[0]);
+  //avoid division By Zero
+  if (fabs(c2) < 0.0001) {
+    c2 = 0.0001;
   }
-  float c3 = 0.0; 
-  if (fabs(c2) > 0.0001) {
-    c3 = (x_[0] * x_[2] + x_[1] * x_[3]) / c2;
-  }
-	Eigen::VectorXd z_pred = VectorXd(3);
-	z_pred << c2, phi,c3;
+  double c3 = (x_[0] * x_[2] + x_[1] * x_[3]) / c2;
+  Eigen::VectorXd z_pred = VectorXd(3);
+  z_pred << c2, phi, c3;
 	
-	VectorXd y = z - z_pred;
-	MatrixXd Ht = H_.transpose();
-	MatrixXd S = H_ * P_ * Ht + R_;
-	MatrixXd Si = S.inverse();
-	MatrixXd PHt = P_ * Ht;
-	MatrixXd K = PHt * Si;
+  VectorXd y = z - z_pred;
 
-	//new estimate
-	x_ = x_ + (K * y);
-	long x_size = x_.size();
-	MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	P_ = (I - K * H_) * P_;
+  //angle normalization
+  while (y(1)> pi) y(1)-=2.*pi;
+  while (y(1)<-pi) y(1)+=2.*pi;
+  
+  // improve these following codes according to review suggestions.
+  MatrixXd Ht = H_.transpose();
+  MatrixXd PHt = P_ * Ht;
+  MatrixXd S = H_ * PHt + R_;
+  //MatrixXd Si = S.inverse();
+  MatrixXd K = PHt * S.inverse();
+
+  //new estimate
+  x_ = x_ + (K * y);
+  long x_size = x_.size();
+  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+  P_ = (I - K * H_) * P_;
 }
