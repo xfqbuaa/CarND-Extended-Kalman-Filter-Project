@@ -7,10 +7,11 @@ Self-Driving Car Engineer Nanodegree Program
 ### Results
 
 Use the new data "obj_pose-laser-radar-synthetic-input.txt" and rmse results are shown below:
-0.0972256
-0.0853761
-0.450855
-0.439588
+* 0.0972256
+* 0.0853761
+* 0.450855
+* 0.439588
+![rmse](./rmse.png)
 
 ### Improve code efficiency
 
